@@ -19,6 +19,7 @@ use yii\base\InvalidParamException;
  * @property string $authKey
  * @property string $authToken
  * @property string $status
+ * @property News[] $news
  */
 class User extends ActiveRecord implements \yii\web\IdentityInterface {
 	const SCENARIO_LOGIN = 'login';
@@ -32,17 +33,6 @@ class User extends ActiveRecord implements \yii\web\IdentityInterface {
 
 	public function behaviors() {
 		return [
-//			[
-//				'class'      => AttributeBehavior::className(),
-//				'attributes' => [
-//					ActiveRecord::EVENT_BEFORE_INSERT => 'password'
-//				],
-//				'value'      => function ( $event ) {
-//					$generatePasswordHash = \Yii::$app->security->generatePasswordHash( $this->password );
-//
-//					return $generatePasswordHash;
-//				}
-//			],
 			[
 				'class'      => AttributeBehavior::className(),
 				'attributes' => [
@@ -64,6 +54,16 @@ class User extends ActiveRecord implements \yii\web\IdentityInterface {
 		return $scenarios;
 	}
 
+	public function attributeLabels() {
+		return [
+			'name'      => 'Your name',
+			'email'     => 'Your email address',
+			'password'  => 'Your password',
+			'password2' => 'Repeat your password',
+			'authKey'   => 'Your auth key'
+		];
+	}
+
 	public function rules() {
 		return [
 			[ [ 'username', 'email' ], 'required', 'on' => self::SCENARIO_REGISTER ],
@@ -74,11 +74,18 @@ class User extends ActiveRecord implements \yii\web\IdentityInterface {
 			[ [ 'authToken', 'password' ], 'required', 'on' => self::SCENARIO_CONFIRM ],
 		];
 	}
-//todo add email validation
+
 	public function validateEmail() {
 		if ( User::findByEmail( $this->email ) ) {
 			$this->addError( 'email', 'User with this email already registered' );
 		}
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function validateAuthKey( $authKey ) {
+		return $this->authKey === $authKey;
 	}
 
 	public function afterSave( $insert, $changedAttributes ) {
@@ -95,14 +102,38 @@ class User extends ActiveRecord implements \yii\web\IdentityInterface {
 		}
 	}
 
-	public function attributeLabels() {
-		return [
-			'name'      => 'Your name',
-			'email'     => 'Your email address',
-			'password'  => 'Your password',
-			'password2' => 'Repeat your password',
-			'authKey'   => 'Your auth key'
-		];
+	/**
+	 * Validates password
+	 *
+	 * @param  string $password password to validate
+	 *
+	 * @return boolean if password provided is valid for current user
+	 */
+	public function validatePassword( $password ) {
+		try {
+			return \Yii::$app->security->validatePassword( $password, $this->password );
+		} catch ( InvalidParamException $e ) {
+			return false;
+		}
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function getId() {
+		return $this->id;
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function getAuthKey() {
+		return $this->authKey;
+	}
+
+	public function getNews()
+	{
+		return $this->hasMany(News::className(), ['user_id' => 'id'])->orderBy('creation_date desc')->all();
 	}
 
 	/**
@@ -154,41 +185,6 @@ class User extends ActiveRecord implements \yii\web\IdentityInterface {
 		) );
 	}
 
-	/**
-	 * @inheritdoc
-	 */
-	public function getId() {
-		return $this->id;
-	}
-
-	/**
-	 * @inheritdoc
-	 */
-	public function getAuthKey() {
-		return $this->authKey;
-	}
-
-	/**
-	 * @inheritdoc
-	 */
-	public function validateAuthKey( $authKey ) {
-		return $this->authKey === $authKey;
-	}
-
-	/**
-	 * Validates password
-	 *
-	 * @param  string $password password to validate
-	 *
-	 * @return boolean if password provided is valid for current user
-	 */
-	public function validatePassword( $password ) {
-		try {
-			return \Yii::$app->security->validatePassword( $password, $this->password );
-		} catch ( InvalidParamException $e ) {
-			return false;
-		}
-	}
 
 	public function isConfirmed() {
 		return $this->status == self::STATUS_CONFIRMED;
