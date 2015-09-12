@@ -13,7 +13,7 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="site-login">
     <h1><?= Html::encode($this->title) ?></h1>
 
-    <p>Please fill authorization key from your email:</p>
+    <p>Please fill auth key and password for complete registration:</p>
 
     <?php $form = ActiveForm::begin([
         'id' => 'register-form',
@@ -25,6 +25,7 @@ $this->params['breadcrumbs'][] = $this->title;
     ]); ?>
 
         <?= $form->field($model, 'authKey') ?>
+        <?= $form->field($model, 'password') ?>
 
         <div class="form-group">
             <div class="col-lg-offset-2 col-lg-11">

@@ -7,7 +7,7 @@
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
 
-$this->title = 'Register';
+$this->title = 'Sign up';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="site-login">
@@ -27,19 +27,12 @@ $this->params['breadcrumbs'][] = $this->title;
         <?= $form->field($model, 'email') ?>
         <?= $form->field($model, 'username') ?>
 
-        <?= $form->field($model, 'password')->passwordInput() ?>
-        <?= $form->field($model, 'password2')->passwordInput() ?>
-
         <div class="form-group">
             <div class="col-lg-offset-2 col-lg-11">
-                <?= Html::submitButton('Register', ['class' => 'btn btn-primary', 'name' => 'register-button']) ?>
+                <?= Html::submitButton('Sign up', ['class' => 'btn btn-primary', 'name' => 'register-button']) ?>
             </div>
         </div>
 
     <?php ActiveForm::end(); ?>
 
-    <div class="col-lg-offset-1" style="color:#999;">
-        You may login with <strong>admin/admin</strong> or <strong>demo/demo</strong>.<br>
-        To modify the username/password, please check out the code <code>app\models\User::$users</code>.
-    </div>
 </div>

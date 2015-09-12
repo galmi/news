@@ -16,10 +16,10 @@ class UserController extends Controller {
 		return [
 			'access' => [
 				'class' => AccessControl::className(),
-				'only'  => [ 'logout', 'confirm' ],
+				'only'  => [ 'logout' ],
 				'rules' => [
 					[
-						'actions' => [ 'logout', 'confirm' ],
+						'actions' => [ 'logout' ],
 						'allow'   => true,
 						'roles'   => [ '@' ],
 					],
@@ -34,7 +34,7 @@ class UserController extends Controller {
 		];
 	}
 
-	public function actionRegister() {
+	public function actionSignup() {
 		if ( ! \Yii::$app->user->isGuest ) {
 			return $this->goHome();
 		}
@@ -42,9 +42,7 @@ class UserController extends Controller {
 		$model = new User();
 		$model->scenario = User::SCENARIO_REGISTER;
 		if ( $model->load( Yii::$app->request->post() ) && $model->save() ) {
-			if ( Yii::$app->getUser()->login( $model ) ) {
-				return $this->redirect( array( 'user/confirm' ) );
-			}
+			return $this->redirect( array( 'user/needconfirm' ) );
 		}
 
 		return $this->render( 'register', [
@@ -52,14 +50,24 @@ class UserController extends Controller {
 		] );
 	}
 
-	public function actionConfirm() {
-		if ( \Yii::$app->user->isGuest ) {
-			return $this->redirect( array( 'user/login' ) );
-		}
+	public function actionNeedconfirm()
+	{
+		return $this->render('needconfirm');
+	}
 
-		$model = new ConfirmForm();
-		if ( $model->load( Yii::$app->request->post() ) && $model->confirmAuthKey() ) {
+	public function actionConfirm($id) {
+		if ( !\Yii::$app->user->isGuest ) {
 			return $this->goHome();
+		}
+		$user = User::findIdentityByAuthKey($id);
+		if (!$user) {
+			return $this->goHome();
+		}
+		$model = new ConfirmForm();
+		$model->user = $user;
+		$model->authKey = $id;
+		if ( $model->load( Yii::$app->request->post() ) && $model->confirmAuthKey() ) {
+			return $this->redirect(['user/login']);
 		}
 
 		return $this->render( 'confirm', [

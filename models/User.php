@@ -5,6 +5,8 @@ namespace app\models;
 use yii\behaviors\AttributeBehavior;
 use yii\db\ActiveRecord;
 use yii\web\IdentityInterface;
+use yii\helpers\Url;
+use yii\base\InvalidParamException;
 
 /**
  * Class User
@@ -30,17 +32,17 @@ class User extends ActiveRecord implements \yii\web\IdentityInterface {
 
 	public function behaviors() {
 		return [
-			[
-				'class'      => AttributeBehavior::className(),
-				'attributes' => [
-					ActiveRecord::EVENT_BEFORE_INSERT => 'password'
-				],
-				'value'      => function ( $event ) {
-					$generatePasswordHash = \Yii::$app->security->generatePasswordHash( $this->password );
-
-					return $generatePasswordHash;
-				}
-			],
+//			[
+//				'class'      => AttributeBehavior::className(),
+//				'attributes' => [
+//					ActiveRecord::EVENT_BEFORE_INSERT => 'password'
+//				],
+//				'value'      => function ( $event ) {
+//					$generatePasswordHash = \Yii::$app->security->generatePasswordHash( $this->password );
+//
+//					return $generatePasswordHash;
+//				}
+//			],
 			[
 				'class'      => AttributeBehavior::className(),
 				'attributes' => [
@@ -56,25 +58,40 @@ class User extends ActiveRecord implements \yii\web\IdentityInterface {
 	public function scenarios() {
 		$scenarios = parent::scenarios();
 		$scenarios[ self::SCENARIO_LOGIN ] = [ 'email', 'password' ];
-		$scenarios[ self::SCENARIO_REGISTER ] = [ 'username', 'email', 'password', 'password2' ];
-		$scenarios[ self::SCENARIO_CONFIRM ] = [ 'authKey', 'status' ];
+		$scenarios[ self::SCENARIO_REGISTER ] = [ 'username', 'email' ];
+		$scenarios[ self::SCENARIO_CONFIRM ] = [ 'authKey', 'status', 'password' ];
 
 		return $scenarios;
 	}
 
 	public function rules() {
 		return [
-			[ [ 'username', 'email', 'password', 'password2' ], 'required', 'on' => self::SCENARIO_REGISTER ],
+			[ [ 'username', 'email' ], 'required', 'on' => self::SCENARIO_REGISTER ],
 			[ 'email', 'validateEmail', 'on' => self::SCENARIO_REGISTER ],
-			[ 'password', 'compare', 'compareAttribute' => 'password2', 'on' => self::SCENARIO_REGISTER ],
+			[ 'email', 'email'],
+//			[ 'password', 'compare', 'compareAttribute' => 'password2', 'on' => self::SCENARIO_REGISTER ],
 			[ [ 'email', 'password' ], 'required', 'on' => self::SCENARIO_LOGIN ],
-			[ [ 'authToken' ], 'required', 'on' => self::SCENARIO_CONFIRM ],
+			[ [ 'authToken', 'password' ], 'required', 'on' => self::SCENARIO_CONFIRM ],
 		];
 	}
-
+//todo add email validation
 	public function validateEmail() {
 		if ( User::findByEmail( $this->email ) ) {
 			$this->addError( 'email', 'User with this email already registered' );
+		}
+	}
+
+	public function afterSave( $insert, $changedAttributes ) {
+		parent::afterSave( $insert, $changedAttributes );
+
+		if ( $insert ) {
+			$link = Url::to(['user/confirm', 'id' => $this->authKey], true);
+			\Yii::$app->mailer->compose()
+			                 ->setTo( $this->email )
+			                 ->setFrom( [ \Yii::$app->params['adminEmail'] => 'Admin' ] )
+			                 ->setSubject( 'Confirmation registration' )
+			                 ->setTextBody( "For confirm email click this link: \n" . $link )
+			                 ->send();
 		}
 	}
 
@@ -131,6 +148,12 @@ class User extends ActiveRecord implements \yii\web\IdentityInterface {
 		) );
 	}
 
+	public static function findIdentityByAuthKey($authKey) {
+		return self::findOne( array(
+			'authKey' => $authKey
+		) );
+	}
+
 	/**
 	 * @inheritdoc
 	 */
@@ -160,10 +183,18 @@ class User extends ActiveRecord implements \yii\web\IdentityInterface {
 	 * @return boolean if password provided is valid for current user
 	 */
 	public function validatePassword( $password ) {
-		return \Yii::$app->security->validatePassword( $password, $this->password );
+		try {
+			return \Yii::$app->security->validatePassword( $password, $this->password );
+		} catch ( InvalidParamException $e ) {
+			return false;
+		}
 	}
 
 	public function isConfirmed() {
 		return $this->status == self::STATUS_CONFIRMED;
+	}
+
+	public function setPassword( $password ) {
+		$this->password = \Yii::$app->security->generatePasswordHash( $password );
 	}
 }

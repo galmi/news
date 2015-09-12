@@ -9,14 +9,18 @@ use yii\base\Model;
  * ConfirmForm is the model behind the login form.
  */
 class ConfirmForm extends Model {
+
+	/** @var User $user */
+	public $user;
 	public $authKey;
+	public $password;
 
 	/**
 	 * @return array the validation rules.
 	 */
 	public function rules() {
 		return [
-			[ 'authKey', 'required' ],
+			[ ['authKey', 'password'], 'required' ],
 			[ 'authKey', 'validateAuthKey' ],
 		];
 	}
@@ -29,11 +33,10 @@ class ConfirmForm extends Model {
 
 	public function confirmAuthKey() {
 		if ( $this->validate() ) {
-			/** @var User $user */
-			$user = Yii::$app->getUser()->getIdentity();
-			$user->scenario = User::SCENARIO_CONFIRM;
-			$user->status = User::STATUS_CONFIRMED;
-			$user->save( true, [ 'status' ] );
+			$this->user->scenario = User::SCENARIO_CONFIRM;
+			$this->user->status = User::STATUS_CONFIRMED;
+			$this->user->setPassword($this->password);
+			$this->user->save( true, [ 'status', 'password' ] );
 
 			return true;
 		}
@@ -41,9 +44,7 @@ class ConfirmForm extends Model {
 	}
 
 	public function validateAuthKey() {
-		/** @var User $user */
-		$user = Yii::$app->getUser()->getIdentity();
-		if ( ! $user->validateAuthKey( $this->authKey ) ) {
+		if ( ! $this->user->validateAuthKey( $this->authKey ) ) {
 			$this->addError( 'authKey', 'Your auth key is wrong' );
 		}
 	}

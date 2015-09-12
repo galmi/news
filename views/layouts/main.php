@@ -36,11 +36,10 @@ AppAsset::register($this);
     $navWidgetItems = [
         [ 'label' => 'Home', 'url' => [ '/site/index' ] ],
         [ 'label' => 'About', 'url' => [ '/site/about' ] ],
-        [ 'label' => 'Contact', 'url' => [ '/site/contact' ] ],
     ];
     $isGuest = Yii::$app->user->isGuest;
     if ( $isGuest ) {
-	    $navWidgetItems[] = [ 'label' => 'Register', 'url' => [ '/user/register' ] ];
+	    $navWidgetItems[] = [ 'label' => 'Sign up', 'url' => [ '/user/signup' ] ];
 	    $navWidgetItems[] = [ 'label' => 'Login', 'url' => [ '/user/login' ] ];
     } else {
 	    if ( ! Yii::$app->getUser()->getIdentity()->isConfirmed() ) {
