@@ -12,7 +12,7 @@ use yii\bootstrap\ActiveForm;
 $this->title = 'Create news';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="site-login">
+<div class="create-news">
 	<h1><?= Html::encode($this->title) ?></h1>
 
 	<p>Please fill out the following fields to add news:</p>
@@ -39,3 +39,5 @@ $this->params['breadcrumbs'][] = $this->title;
 	<?php ActiveForm::end(); ?>
 
 </div>
+<hr>
+<?= Html::a('Back', Yii::$app->request->referrer);?>

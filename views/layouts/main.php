@@ -34,8 +34,7 @@ AppAsset::register($this);
         ],
     ]);
     $navWidgetItems = [
-        [ 'label' => 'Home', 'url' => [ '/site/index' ] ],
-        [ 'label' => 'About', 'url' => [ '/site/about' ] ],
+        [ 'label' => 'Home', 'url' => [ '/news/index' ] ],
     ];
     $isGuest = Yii::$app->user->isGuest;
     if ( $isGuest ) {
@@ -44,7 +43,9 @@ AppAsset::register($this);
     } else {
 	    if ( ! Yii::$app->getUser()->getIdentity()->isConfirmed() ) {
 		    $navWidgetItems[] = [ 'label' => 'Confirm', 'url' => [ '/user/confirm' ] ];
-	    }
+	    } else {
+            $navWidgetItems[] = [ 'label' => 'My news', 'url' => [ '/news/my' ] ];
+        }
 	    $navWidgetItems[] = [
 		    'label'       => 'Logout (' . Yii::$app->user->identity->username . ')',
 		    'url'         => [ '/user/logout' ],

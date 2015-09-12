@@ -16,9 +16,10 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="site-news">
 	<h1><?= Html::encode( $this->title ) ?></h1>
 
+	<?php if (Yii::$app->user->identity) { ?>
 	<p><?= HTML::a( "Add news", [ 'news/create' ] ) ?></p>
+	<?php } ?>
 	<?php foreach ( $news as $row ) { ?>
 		<?= NewsWidget::widget(['news' => $row, 'full' => false]); ?>
 	<?php } ?>
-	<code><?= __FILE__ ?></code>
 </div>
