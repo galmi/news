@@ -16,7 +16,7 @@ if ($full) {
 <?php } else { ?>
 	<h3><?= Html::encode( $news->title ) ?></h3>
 <?php } ?>
-<p><?= date( "d-M-Y H:i:s", strtotime( $news->creation_date ) ); ?> by <?= $news->getUser()->username; ?> |
+<p><?= date( "d-M-Y H:i:s", strtotime( $news->creation_date ) ); ?> by <?= $news->getUser()->username . '/' . $news->getUser()->email; ?> |
 	<?= (Yii::$app->user->identity && ($news->getUser()->id == Yii::$app->user->identity->id))?Html::a('Delete', ['news/delete', 'id' => $news->id]) . ' | ':''; ?>
 	<?= Html::a('Download PDF', ['news/pdf', 'id' => $news->id]);?>
 </p>

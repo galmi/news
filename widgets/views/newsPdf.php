@@ -3,7 +3,7 @@
 use yii\helpers\Html;
 ?>
 <h1><?= Html::encode( $news->title ) ?></h1>
-<p><?= date( "d-M-Y H:i:s", strtotime( $news->creation_date ) ); ?> by <?= $news->getUser()->username; ?>
+<p><?= date( "d-M-Y H:i:s", strtotime( $news->creation_date ) ); ?> by <?= $news->getUser()->username . '/' . $news->getUser()->email; ?>
 </p>
 <table border="0">
 	<tr>
