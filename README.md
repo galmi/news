@@ -4,7 +4,7 @@ Test project News Portal
 Installation
 ------------
 
-1.Clone project
+1. Clone project
  
  ~~~
  git clone git@github.com:galmi/news.git
