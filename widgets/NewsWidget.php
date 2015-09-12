@@ -16,8 +16,12 @@ class NewsWidget extends Widget {
 
 	public $news;
 	public $full = false;
+	public $pdf = false;
 
 	public function run() {
+		if ($this->pdf) {
+			return $this->renderFile(__DIR__ . '/views/newsPdf.php', ['news' => $this->news]);
+		}
 		return $this->renderFile(__DIR__ . '/views/news.php', ['news' => $this->news, 'full' => $this->full]);
 	}
 

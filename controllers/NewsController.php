@@ -10,6 +10,7 @@ namespace app\controllers;
 
 use app\models\News;
 use app\models\User;
+use app\widgets\NewsWidget;
 use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
 use yii\helpers\StringHelper;
@@ -118,5 +119,21 @@ class NewsController extends Controller {
 				}
 			]
 		]);
+	}
+
+	public function actionPdf($id)
+	{
+		/** @var News $news */
+		$news = News::findOne($id);
+
+		$pdf = new \mPDF();
+		$response = \Yii::$app->getResponse();
+		$headers = $response->getHeaders();
+
+		$headers->set('Content-Type', 'application/pdf; charset=utf-8');
+
+		$html = NewsWidget::widget(['news' => $news, 'pdf' => true]);
+		$pdf->WriteHTML($html);
+		$response->content = $pdf->Output();
 	}
 }
