@@ -28,6 +28,7 @@ class ConfirmForm extends Model {
 	public function attributeLabels() {
 		return [
 			'authKey' => 'Your auth key from email',
+			'password' => 'New password'
 		];
 	}
 

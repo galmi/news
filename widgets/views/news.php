@@ -20,26 +20,18 @@ if ($full) {
 	<?= (Yii::$app->user->identity && ($news->getUser()->id == Yii::$app->user->identity->id))?Html::a('Delete', ['news/delete', 'id' => $news->id]) . ' | ':''; ?>
 	<?= Html::a('Download PDF', ['news/pdf', 'id' => $news->id]);?>
 </p>
-<table border="0">
-	<tr>
-		<?php
-		if ( $news->photo ) {
-			?>
-		<td width="100px">
-			<?= Html::img( $news->photo, [ 'align' => 'left', 'width'=>100, 'height'=>100, 'hspace' => "20" ] );?>
-			</td>
-		<?php } ?>
-		<td valign="top">
-			<?php
-			if ($full) {
-				echo nl2br(Html::encode( $news->news ));
-			} else {
-				echo Html::a(Html::encode( StringHelper::truncate($news->news, 100 )), ['news/read', 'id' => $news->id]);
-			}
-			?>
-		</td>
-	</tr>
-</table>
+<p>
+	<?php
+	if ( $news->photo ) {
+		echo Html::img( $news->photo, [ 'align' => 'left', 'width'=>100, 'height'=>100, 'hspace' => "20" ] );
+	}
+	if ($full) {
+		echo nl2br(Html::encode( $news->news ));
+	} else {
+		echo Html::a(Html::encode( StringHelper::truncate($news->news, 100 )), ['news/read', 'id' => $news->id]);
+	}
+	?>
+</p>
 <div class="clearfix"></div>
 <hr>
 <?= $full?Html::a('Back', Yii::$app->request->referrer):'';?>

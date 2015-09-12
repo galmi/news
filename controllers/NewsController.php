@@ -132,7 +132,7 @@ class NewsController extends Controller {
 
 		$headers->set('Content-Type', 'application/pdf; charset=utf-8');
 
-		$html = NewsWidget::widget(['news' => $news, 'pdf' => true]);
+		$html = NewsWidget::widget(['news' => $news, 'full' => true, 'pdf' => true]);
 		$pdf->WriteHTML($html);
 		$response->content = $pdf->Output();
 	}

@@ -95,11 +95,7 @@ class UserController extends Controller {
 
 		$model = new LoginForm();
 		if ( $model->load( Yii::$app->request->post() ) && $model->login() ) {
-			if ( ! \Yii::$app->user->identity->isConfirmed() ) {
-				return $this->redirect( array( 'user/confirm' ) );
-			}
-
-			return $this->goBack();
+			return $this->goHome();
 		}
 
 		return $this->render( 'login', [
@@ -116,4 +112,13 @@ class UserController extends Controller {
 		return $this->goHome();
 	}
 
+	public function resendAction( $email ) {
+		/** @var User $user */
+		$user = User::findByEmail($email);
+		if ($user->status == User::STATUS_NOT_CONFIRMED) {
+			$user->sendConfirmationEmail();
+			return $this->redirect(['user/needconfirm']);
+		}
+		return $this->goHome();
+	}
 }

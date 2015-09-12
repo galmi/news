@@ -68,7 +68,7 @@ class User extends ActiveRecord implements \yii\web\IdentityInterface {
 		return [
 			[ [ 'username', 'email' ], 'required', 'on' => self::SCENARIO_REGISTER ],
 			[ 'email', 'validateEmail', 'on' => self::SCENARIO_REGISTER ],
-			[ 'email', 'email'],
+			[ 'email', 'email' ],
 //			[ 'password', 'compare', 'compareAttribute' => 'password2', 'on' => self::SCENARIO_REGISTER ],
 			[ [ 'email', 'password' ], 'required', 'on' => self::SCENARIO_LOGIN ],
 			[ [ 'authToken', 'password' ], 'required', 'on' => self::SCENARIO_CONFIRM ],
@@ -88,18 +88,17 @@ class User extends ActiveRecord implements \yii\web\IdentityInterface {
 		return $this->authKey === $authKey;
 	}
 
-	public function afterSave( $insert, $changedAttributes ) {
-		parent::afterSave( $insert, $changedAttributes );
+	public function beforeSave( $insert ) {
+		if ( parent::beforeSave( $insert ) ) {
 
-		if ( $insert ) {
-			$link = Url::to(['user/confirm', 'id' => $this->authKey], true);
-			\Yii::$app->mailer->compose()
-			                 ->setTo( $this->email )
-			                 ->setFrom( [ \Yii::$app->params['adminEmail'] => 'Admin' ] )
-			                 ->setSubject( 'Confirmation registration' )
-			                 ->setTextBody( "For confirm email click this link: \n" . $link )
-			                 ->send();
+			if ( $insert ) {
+				$this->sendConfirmationEmail();
+			}
+
+			return true;
 		}
+
+		return false;
 	}
 
 	/**
@@ -131,9 +130,8 @@ class User extends ActiveRecord implements \yii\web\IdentityInterface {
 		return $this->authKey;
 	}
 
-	public function getNews()
-	{
-		return $this->hasMany(News::className(), ['user_id' => 'id'])->orderBy('creation_date desc')->all();
+	public function getNews() {
+		return $this->hasMany( News::className(), [ 'user_id' => 'id' ] )->orderBy( 'creation_date desc' )->all();
 	}
 
 	/**
@@ -179,7 +177,7 @@ class User extends ActiveRecord implements \yii\web\IdentityInterface {
 		) );
 	}
 
-	public static function findIdentityByAuthKey($authKey) {
+	public static function findIdentityByAuthKey( $authKey ) {
 		return self::findOne( array(
 			'authKey' => $authKey
 		) );
@@ -192,5 +190,15 @@ class User extends ActiveRecord implements \yii\web\IdentityInterface {
 
 	public function setPassword( $password ) {
 		$this->password = \Yii::$app->security->generatePasswordHash( $password );
+	}
+
+	public function sendConfirmationEmail() {
+		$link = Url::to( [ 'user/confirm', 'id' => $this->authKey ], true );
+		\Yii::$app->mailer->compose()
+		                  ->setTo( $this->email )
+		                  ->setFrom( [ \Yii::$app->params['adminEmail'] => 'Admin' ] )
+		                  ->setSubject( 'Confirmation email' )
+		                  ->setTextBody( "For confirm email click this link: \n" . $link )
+		                  ->send();
 	}
 }

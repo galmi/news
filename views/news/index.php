@@ -22,4 +22,7 @@ $this->params['breadcrumbs'][] = $this->title;
 	<?php foreach ( $news as $row ) { ?>
 		<?= NewsWidget::widget(['news' => $row, 'full' => false]); ?>
 	<?php } ?>
+	<?php if (!$news) { ?>
+		<p>Not have news</p>
+	<?php } ?>
 </div>
