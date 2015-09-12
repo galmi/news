@@ -34,6 +34,9 @@ class UserController extends Controller {
 		];
 	}
 
+	/**
+	 * @return string|\yii\web\Response
+	 */
 	public function actionSignup() {
 		if ( ! \Yii::$app->user->isGuest ) {
 			return $this->goHome();
@@ -50,24 +53,31 @@ class UserController extends Controller {
 		] );
 	}
 
-	public function actionNeedconfirm()
-	{
-		return $this->render('needconfirm');
+	/**
+	 * @return string
+	 */
+	public function actionNeedconfirm() {
+		return $this->render( 'needconfirm' );
 	}
 
-	public function actionConfirm($id) {
-		if ( !\Yii::$app->user->isGuest ) {
+	/**
+	 * @param $id
+	 *
+	 * @return string|\yii\web\Response
+	 */
+	public function actionConfirm( $id ) {
+		if ( ! \Yii::$app->user->isGuest ) {
 			return $this->goHome();
 		}
-		$user = User::findIdentityByAuthKey($id);
-		if (!$user) {
+		$user = User::findIdentityByAuthKey( $id );
+		if ( ! $user ) {
 			return $this->goHome();
 		}
 		$model = new ConfirmForm();
 		$model->user = $user;
 		$model->authKey = $id;
 		if ( $model->load( Yii::$app->request->post() ) && $model->confirmAuthKey() ) {
-			return $this->redirect(['user/login']);
+			return $this->redirect( [ 'user/login' ] );
 		}
 
 		return $this->render( 'confirm', [
@@ -75,6 +85,9 @@ class UserController extends Controller {
 		] );
 	}
 
+	/**
+	 * @return string|\yii\web\Response
+	 */
 	public function actionLogin() {
 		if ( ! \Yii::$app->user->isGuest ) {
 			return $this->goHome();
@@ -82,9 +95,10 @@ class UserController extends Controller {
 
 		$model = new LoginForm();
 		if ( $model->load( Yii::$app->request->post() ) && $model->login() ) {
-			if ( !\Yii::$app->user->identity->isConfirmed() ) {
+			if ( ! \Yii::$app->user->identity->isConfirmed() ) {
 				return $this->redirect( array( 'user/confirm' ) );
 			}
+
 			return $this->goBack();
 		}
 
@@ -93,6 +107,9 @@ class UserController extends Controller {
 		] );
 	}
 
+	/**
+	 * @return \yii\web\Response
+	 */
 	public function actionLogout() {
 		Yii::$app->user->logout();
 

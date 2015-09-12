@@ -10,8 +10,8 @@ namespace app\models;
 
 
 use yii\behaviors\AttributeBehavior;
-use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
+use yii\web\UploadedFile;
 
 /**
  * Class News
@@ -25,7 +25,9 @@ use yii\db\ActiveRecord;
  * @property integer $user_id
  */
 class News extends ActiveRecord {
-	const SCENARIO_CREATE = 'create';
+
+	/** @var UploadedFile $file */
+	public $file;
 
 	public function behaviors() {
 		return [
@@ -37,14 +39,22 @@ class News extends ActiveRecord {
 				'value'      => function ( $event ) {
 					return \Yii::$app->user->identity->getId();
 				}
+			],
+			[
+				'class'      => AttributeBehavior::className(),
+				'attributes' => [
+					ActiveRecord::EVENT_BEFORE_INSERT => 'photo'
+				],
+				'value'      => function ( $event ) {
+					if ($this->file instanceof UploadedFile) {
+						$path = 'uploads/' . $this->file->baseName . '.' . $this->file->extension;
+						$this->file->saveAs( $path );
+						return $path;
+					}
+					return null;
+				}
 			]
 		];
-	}
-
-	public function scenarios() {
-		$scenarios = parent::scenarios();
-		$scenarios[ self::SCENARIO_CREATE ] = [ 'title', 'photo', 'news', 'user_id' ];
-		return $scenarios;
 	}
 
 	public function attributeLabels() {
@@ -57,7 +67,16 @@ class News extends ActiveRecord {
 
 	public function rules() {
 		return [
-			[ [ 'title', 'news' ], 'required', 'on' => self::SCENARIO_CREATE ],
+			[ [ 'title', 'news' ], 'required' ],
+			[
+				'file',
+				'file',
+				'mimeTypes' => [
+					'image/jpeg',
+					'image/gif',
+					'image/png'
+				]
+			]
 		];
 	}
 

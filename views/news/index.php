@@ -10,7 +10,7 @@ use app\widgets\NewsWidget;
 use yii\helpers\Html;
 use yii\helpers\StringHelper;
 
-$this->title = 'My news';
+$this->title = $title;
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="site-news">
@@ -19,7 +19,6 @@ $this->params['breadcrumbs'][] = $this->title;
 	<p><?= HTML::a( "Add news", [ 'news/create' ] ) ?></p>
 	<?php foreach ( $news as $row ) { ?>
 		<?= NewsWidget::widget(['news' => $row, 'full' => false]); ?>
-		<hr>
 	<?php } ?>
 	<code><?= __FILE__ ?></code>
 </div>

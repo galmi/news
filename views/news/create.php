@@ -19,7 +19,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
 	<?php $form = ActiveForm::begin([
 		'id' => 'register-form',
-		'options' => ['class' => 'form-horizontal'],
+		'options' => ['class' => 'form-horizontal', 'enctype' => 'multipart/form-data'],
 		'fieldConfig' => [
 			'template' => "{label}\n<div class=\"col-lg-3\">{input}</div>\n<div class=\"col-lg-8\">{error}</div>",
 			'labelOptions' => ['class' => 'col-lg-2 control-label'],
@@ -27,7 +27,7 @@ $this->params['breadcrumbs'][] = $this->title;
 	]); ?>
 
 	<?= $form->field($model, 'title') ?>
-	<?= $form->field($model, 'photo')->fileInput() ?>
+	<?= $form->field($model, 'file')->fileInput() ?>
 	<?= $form->field($model, 'news')->textarea() ?>
 
 	<div class="form-group">

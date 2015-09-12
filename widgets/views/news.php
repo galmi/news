@@ -22,13 +22,15 @@ if ($full) {
 <p>
 	<?php
 	if ( $news->photo ) {
-		echo Html::img( $news->photo, [ 'align' => 'left' ] );
+		echo Html::img( $news->photo, [ 'align' => 'left', 'width'=>100, 'height'=>100, 'hspace' => "20" ] );
 	}
 	if ($full) {
 		echo nl2br(Html::encode( $news->news ));
 	} else {
-		echo Html::encode( StringHelper::truncate($news->news, 100 ));
+		echo Html::a(Html::encode( StringHelper::truncate($news->news, 100 )), ['news/read', 'id' => $news->id]);
 	}
 	?>
 </p>
-<?= $full?Html::a('Back', Yii::$app->request->referrer):Html::a('Read full news', ['news/read', 'id' => $news->id]);?>
+<div class="clearfix"></div>
+<hr>
+<?= $full?Html::a('Back', Yii::$app->request->referrer):'';?>

@@ -12,6 +12,7 @@ use app\models\News;
 use app\models\User;
 use yii\filters\AccessControl;
 use yii\web\Controller;
+use yii\web\UploadedFile;
 
 class NewsController extends Controller {
 
@@ -31,6 +32,11 @@ class NewsController extends Controller {
 	}
 
 	public function actionIndex() {
+		$news = News::find()->limit(10)->orderBy('creation_date desc')->all();
+		return $this->render( 'index', array( 'news' => $news, 'title' => 'All news' ) );
+	}
+
+	public function actionFeed() {
 
 	}
 
@@ -45,14 +51,15 @@ class NewsController extends Controller {
 		$user = \Yii::$app->user->identity;
 		$news = $user->getNews();
 
-		return $this->render( 'my', array( 'news' => $news ) );
+		return $this->render( 'index', array( 'news' => $news, 'title' => 'My news' ) );
 	}
 
 	public function actionCreate() {
 		$model = new News();
-		$model->scenario = News::SCENARIO_CREATE;
 
-		if ( $model->load( \Yii::$app->request->post() ) && $model->insert() ) {
+		if ( $model->load( \Yii::$app->request->post() ) ) {
+			$model->file = UploadedFile::getInstance($model, 'file');
+			$model->insert();
 			return $this->redirect( array( 'news/my' ) );
 		}
 
@@ -62,9 +69,9 @@ class NewsController extends Controller {
 	public function actionDelete( $id ) {
 		/** @var News $news */
 		$news = News::findOne($id);
-		if ($news->user_id == \Yii::$app->user->identity->id) {
+		if ($news && $news->user_id == \Yii::$app->user->identity->id) {
 			$news->delete();
 		}
-		$this->goBack(['news/my']);
+		return $this->goBack(['news/my']);
 	}
 }
