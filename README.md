@@ -58,6 +58,7 @@ Configure mailer
   ];
   ```
 3. Using php mail
+
   ```php
   return [
   	'class' => 'yii\swiftmailer\Mailer',
@@ -67,6 +68,7 @@ Configure mailer
   ];
   ```
 4. Using SMTP server
+
   ```php
   return [
      'class' => 'yii\swiftmailer\Mailer',
