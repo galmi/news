@@ -8,7 +8,7 @@ class m150912_135359_news extends Migration {
 		$this->execute( 'CREATE TABLE `news` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `title` varchar(255) NOT NULL,
-  `photo` varchar(255) NOT NULL,
+  `photo` varchar(255) DEFAULT NULL,
   `news` text NOT NULL,
   `creation_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `user_id` int(11) NOT NULL,

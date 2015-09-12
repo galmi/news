@@ -11,7 +11,7 @@ use yii\helpers\Html;
 		if ( $news->photo ) {
 			?>
 			<td width="100px" valign="top">
-				<?= Html::img( substr($news->photo,1), [ 'align' => 'left', 'width'=>100, 'height'=>100, 'hspace' => "20" ] );?>
+				<?= Html::img( $news->photo, [ 'align' => 'left', 'width'=>100, 'height'=>100, 'hspace' => "20" ] );?>
 			</td>
 		<?php } ?>
 		<td valign="top">

@@ -23,7 +23,7 @@ if ($full) {
 <p>
 	<?php
 	if ( $news->photo ) {
-		echo Html::img( $news->photo, [ 'align' => 'left', 'width'=>100, 'height'=>100, 'hspace' => "20" ] );
+		echo Html::img( '/' . $news->photo, [ 'align' => 'left', 'width'=>100, 'height'=>100, 'hspace' => "20" ] );
 	}
 	if ($full) {
 		echo nl2br(Html::encode( $news->news ));

@@ -47,7 +47,7 @@ class News extends ActiveRecord {
 				],
 				'value'      => function ( $event ) {
 					if ($this->file instanceof UploadedFile) {
-						$path = '/uploads/' . $this->file->baseName . '.' . $this->file->extension;
+						$path = 'uploads/' . $this->file->baseName . '.' . $this->file->extension;
 						$this->file->saveAs( $path );
 						return $path;
 					}
